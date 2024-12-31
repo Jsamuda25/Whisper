@@ -13,9 +13,6 @@ def signal_handler(sig, frame):
 
 # Callback function for each captured packet
 def packet_callback(packet):
-    # print(packet.summary())
-    # print(packet.show())
-
     try:
         if packet.haslayer("IP"):
             src_ip = packet["IP"].src
