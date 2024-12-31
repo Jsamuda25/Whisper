@@ -1,6 +1,6 @@
-# Packet Sniffer Project
+# Whisper - IDS
 
-This is a basic packet sniffer built using Scapy in Python. It captures packets from the network and prints a summary of each packet.
+This is a network intrusion detection system built using Scapy in Python. It captures packets from the network and prints a summary of each packet.
 
 ## Setup
 
