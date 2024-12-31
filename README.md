@@ -6,6 +6,7 @@ Current capabilities:
 - Captures packets from the network and prints a summary of each packet.
 - Identifies potentially threatening port scans.
 - Identifies potential denial of service attacks based the volume and frequency of certain requests.
+- Send alert emails upon the detection of suspicious activity.
 
 ## Setup
 
