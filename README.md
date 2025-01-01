@@ -6,6 +6,7 @@ Current capabilities:
 - Captures packets from the network and prints a summary of each packet.
 - Identifies potentially threatening port scans.
 - Identifies potential denial of service attacks based the volume and frequency of certain requests.
+- Signature-based detection through the listing of malicious IPs, payload structures, and domain names.
 - Send alert emails upon the detection of suspicious activity.
 
 ## Setup
