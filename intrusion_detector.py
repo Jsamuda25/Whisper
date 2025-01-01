@@ -1,9 +1,10 @@
-import time
-import smtplib
+import                                  time
+import                                  smtplib
 from email.mime.multipart       import MIMEMultipart
 from email.mime.text            import MIMEText
 from dotenv                     import load_dotenv
-import os
+import                                  os
+import                                  json
 
 # Load the .env file
 load_dotenv()
@@ -26,7 +27,7 @@ RECEIVER_EMAIL = os.getenv("RECEIVER_EMAIL")
 print("Receiver Email: " + str(RECEIVER_EMAIL))
 
 
-# set up email alerts
+# set up and send email alerts
 def send_alert(message):
     sender_email = SENDER_EMAIL
     receiver_email = RECEIVER_EMAIL
@@ -116,3 +117,54 @@ def detect_dos_attack(packet):
     except Exception as e:
         print(f"Error processing packet: {e}")
 
+
+# Function implements signature-based detection based on predefined signatures
+def signature_based_detection(packet):
+
+    # Open the JSON file
+    with open('signatures.json') as f:
+        data = json.load(f)
+        blocklist           = data["blocklist_ip"]
+        payloads            = data["malicious_payloads"]
+        malicious_domains   = data["malicious_domains"]
+
+    flag_source_ip(packet, blocklist)
+    flag_malicious_payloads(packet, payloads)
+    flag_malicious_domains(packet, malicious_domains)
+
+
+def flag_source_ip(packet, blocklist):
+    try:
+        if packet.haslayer("IP"):
+            src_ip  = packet["IP"].src
+
+            if src_ip in blocklist:
+                print(f"Flagged source IP detected: {src_ip}!")
+    
+    except Exception as e:
+        print(f"Error processing packet: {e}")
+
+def flag_malicious_payloads(packet, payloads):
+    try:
+        if packet.haslayer("Raw"):
+            raw_data = bytes(packet["Raw"].load)
+            for pattern in payloads:
+                if pattern in str(raw_data):
+                    print(f"Alert! Malicious payload detected: {str(pattern)}")
+                    break  # Stop checking after detecting one pattern
+        
+
+    except Exception as e:
+        print(f"Error processing packet: {e}")
+
+def flag_malicious_domains(packet, malicious_domains):
+    try:
+        if packet.haslayer("DNS"):
+            domain_name = packet["DNS"].qd.qname.decode()
+            
+            if domain_name in malicious_domains:
+                print(f"Alert! Malicious domain detected: {domain_name}")
+        
+
+    except Exception as e:
+        print(f"Error processing packet: {e}")

@@ -1,0 +1,17 @@
+{
+    "blocklist_ip": [
+      "192.168.1.100",
+      "203.0.113.1",  "10.0.0.141"
+    ],
+    "malicious_payloads": [
+      "\\x90\\x90\\xeb",
+      "\\x68\\x2f\\x62\\x69\\x6e"
+    ],
+    "malicious_domains":[
+        "serak.top",
+        "1312stealer.ru",
+        "paulmaney.000webhostapp.com",
+        "kaspersky-secure.ru"
+    ]
+  }
+  
