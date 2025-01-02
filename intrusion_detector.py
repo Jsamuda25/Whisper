@@ -9,6 +9,7 @@ from dotenv                         import load_dotenv
 from scapy.layers.inet              import IP, TCP
 from scapy.layers.dns               import DNS
 from scapy.packet                   import Raw
+from logger                         import ThreatLogger
 
 # Load the .env file
 load_dotenv()
@@ -30,7 +31,18 @@ class IntrusionDetector:
         self.DOS_THRESHOLD = 100
         self.DOS_TIME_LIMIT = 30  # secs
 
+        # Threat logger
+        self.logger = ThreatLogger()
+
         print(f"Receiver Email: {self.receiver_email}")
+
+        self.signature = ""
+
+    def set_signature(self, sig):
+        self.signature = sig
+    
+    def get_signature(self):
+        return self.signature
 
     def send_alert(self, message):
         """Send an alert via email."""
@@ -71,6 +83,7 @@ class IntrusionDetector:
                         alert_message = f"Port scan detected! IP: {ip_src} scanning port {tcp_dport}"
                         print(alert_message)
                         self.send_alert(alert_message)
+                        self.logger.log_alert(threat_type="Port Scan", ip=ip_src, port=tcp_dport, severity=1, details=alert_message)
                         self.connection_attempts_scan[ip_src][tcp_dport]["count"] = 0
 
                 self.connection_attempts_scan[ip_src][tcp_dport]["last_time"] = current_time
@@ -94,6 +107,7 @@ class IntrusionDetector:
                         alert_message = f"DoS attack detected! IP: {ip_src}"
                         print(alert_message)
                         self.send_alert(alert_message)
+                        self.logger.log_alert(threat_type="Denial of Service", ip=ip_src, severity=1, details=alert_message)
                         self.connection_attempts[ip_src]["count"] = 0
                 else:
                     if current_time - self.connection_attempts[ip_src]["last_time"] >= self.DOS_TIME_LIMIT:
@@ -115,6 +129,8 @@ class IntrusionDetector:
             self.flag_source_ip(packet, blocklist)
             self.flag_malicious_payloads(packet, payloads)
             self.flag_malicious_domains(packet, malicious_domains)
+            self.logger.log_alert(threat_type=self.get_signature(), severity=1, details=f"Signature-based detection flagged packet: \n {packet.summary()}.")
+
         except Exception as e:
             print(f"Error in signature_based_detection: {e}")
 
@@ -125,6 +141,8 @@ class IntrusionDetector:
                 src_ip = packet[IP].src
                 if src_ip in blocklist:
                     print(f"Flagged source IP detected: {src_ip}!")
+                    self.set_signature("Source IP")
+
         except Exception as e:
             print(f"Error in flag_source_ip: {e}")
 
@@ -136,6 +154,7 @@ class IntrusionDetector:
                 for pattern in payloads:
                     if pattern in str(raw_data):
                         print(f"Alert! Malicious payload detected: {pattern}")
+                        self.set_signature("Malicious Payload")
                         break
         except Exception as e:
             print(f"Error in flag_malicious_payloads: {e}")
@@ -147,5 +166,6 @@ class IntrusionDetector:
                 domain_name = packet[DNS].qd.qname.decode()
                 if domain_name in malicious_domains:
                     print(f"Alert! Malicious domain detected: {domain_name}")
+                    self.set_signature("Suspicious Domain Name")
         except Exception as e:
             print(f"Error in flag_malicious_domains: {e}")
