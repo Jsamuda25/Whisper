@@ -1,6 +1,6 @@
 # Whisper - IDS
 
-This is a network intrusion detection system built using Scapy in Python.
+This is a packet sniffer/network intrusion detection system built using Scapy in Python.
 
 Current capabilities:
 - Captures packets from the network and prints a summary of each packet.
