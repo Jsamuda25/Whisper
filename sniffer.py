@@ -1,58 +1,55 @@
-from scapy.all import sniff, get_if_list
-import                          signal
-import                          sys
-from intrusion_detector import detect_port_scan, detect_dos_attack, signature_based_detection #import IDS functions
+from scapy.all                      import sniff, get_if_list
+import                                     signal
+import                                     sys
 
-# Get the list of available interfaces
-interfaces = get_if_list()
+from intrusion_detector             import IntrusionDetector
 
-# Handle graceful exit
-def signal_handler(sig, frame):
-    print("Gracefully stopping the packet sniffer...")
-    sys.exit(0)
+class PacketSniffer:
+    def __init__(self, interface="Wi-Fi"):
+        self.interface = interface
+        self.detector = IntrusionDetector()
 
-# Callback function for each captured packet
-def packet_callback(packet):
-    
-    try:
-        if packet.haslayer("IP"):
-            # Get the IP layer information (source and destination IP)
-            src_ip = packet["IP"].src
-            dest_ip = packet["IP"].dst
-            print(f"Source IP: {src_ip} -> Destination IP: {dest_ip}")
+    def signal_handler(self, sig, frame):
+        """Handle graceful exit on signal interruption."""
+        print("Gracefully stopping the packet sniffer...")
+        sys.exit(0)
 
-            # Check if the packet has a transport layer (TCP/UDP)
-            if packet.haslayer("TCP"):
-                src_port = packet["TCP"].sport  # Source port
-                dest_port = packet["TCP"].dport  # Destination port
-                print(f"Source Port: {src_port} -> Destination Port: {dest_port}")
+    def packet_callback(self, packet):
+        """Callback function to process each captured packet."""
+        try:
+            if packet.haslayer("IP"):
+                # Get the IP layer information (source and destination IP)
+                src_ip  = packet["IP"].src
+                dest_ip = packet["IP"].dst
+                print(f"Source IP: {src_ip} -> Destination IP: {dest_ip}")
 
-            elif packet.haslayer("UDP"):
-                src_port = packet["UDP"].sport  # Source port
-                dest_port = packet["UDP"].dport  # Destination port
-                print(f"Source Port: {src_port} -> Destination Port: {dest_port}")
+                # Check if the packet has a transport layer (TCP/UDP)
+                if packet.haslayer("TCP"):
+                    src_port     = packet["TCP"].sport  # Source port
+                    dest_port   = packet["TCP"].dport  # Destination port
+                    print(f"Source Port: {src_port} -> Destination Port: {dest_port}")
 
-        signature_based_detection(packet)
-        detect_port_scan(packet)  # Check for port scanning
-        detect_dos_attack(packet)  # Check for DoS attacks
+                elif packet.haslayer("UDP"):
+                    src_port    = packet["UDP"].sport  # Source port
+                    dest_port   = packet["UDP"].dport  # Destination port
+                    print(f"Source Port: {src_port} -> Destination Port: {dest_port}")
 
-        print("_________\n")
+            # Call intrusion detection functions
+            self.detector.signature_based_detection(packet)
+            self.detector.detect_port_scan(packet)
+            self.detector.detect_dos_attack(packet)
 
-    except Exception as e:
-        print(f"Error processing packet:{e}")
+            print("_________\n")
 
-# Start sniffing packets
-def start_sniffer():
-    print("Sniffer started. Press Ctrl+C to stop.")
-    
-    # Set up signal handler for graceful exit
-    signal.signal(signal.SIGINT, signal_handler)
-    
-    # Sniff indefinitely (without a limit on the number of packets)
-    sniff(iface="Wi-Fi", prn=packet_callback, store=False, count = 20)
+        except Exception as e:
+            print(f"Error processing packet: {e}")
 
+    def start(self):
+        """Start sniffing packets."""
+        print(f"Sniffer started on interface {self.interface}. Press Ctrl+C to stop.")
 
+        # Set up signal handler for graceful exit
+        signal.signal(signal.SIGINT, self.signal_handler)
 
-if __name__ == "__main__":
-    start_sniffer()
-
+        # Start sniffing packets
+        sniff(iface=self.interface, prn=self.packet_callback, store=False, count=20)
