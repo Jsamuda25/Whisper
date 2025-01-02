@@ -1,5 +1,4 @@
 from sniffer import PacketSniffer 
-from intrusion_detector import IntrusionDetector  
 
 def main():
     # Create an instance of PacketSniffer and start sniffing
