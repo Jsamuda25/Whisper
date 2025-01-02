@@ -1,5 +1,5 @@
-from sniffer import PacketSniffer  # Import PacketSniffer from sniffer.py
-from intrusion_detector import IntrusionDetector  # Import IntrusionDetector from intrusion_detector.py
+from sniffer import PacketSniffer 
+from intrusion_detector import IntrusionDetector  
 
 def main():
     # Create an instance of PacketSniffer and start sniffing
