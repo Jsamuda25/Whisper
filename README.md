@@ -1,6 +1,6 @@
 # Network Security Monitoring System
 
-This project is a lightweight network security monitoring system built with Python, utilizing Scapy for packet sniffing, a custom Intrusion Detection System (IDS), and a Flask dashboard for real-time monitoring of network activities and security alerts.
+This project is a lightweight network security monitoring system built with Python, utilizing Scapy for packet sniffing, a custom Intrusion Detection System, and a Flask dashboard for real-time monitoring of network activities and security alerts.
 
 ## Features
 
