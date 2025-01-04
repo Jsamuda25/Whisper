@@ -10,7 +10,7 @@ Current capabilities:
 - Send alert emails upon the detection of suspicious activity.
 - Dashboard/UI displays alerts/event logs.
 
-Goals:
+Goal capabilities:
 - Host application instead of running it locally.
 - Allow the creation of packets to test the system.
 - Expand to interfaces beyond Wi-Fi, for example ethernet.
