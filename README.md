@@ -1,36 +1,98 @@
-# Whisper - IDS
+# Network Security Monitoring System
 
-This is a packet sniffer/network intrusion detection system built using Scapy in Python.
+This project is a lightweight network security monitoring system built with Python, utilizing Scapy for packet sniffing, a custom Intrusion Detection System (IDS), and a Flask dashboard for real-time monitoring of network activities and security alerts.
 
-Current capabilities:
-- Captures packets from the network and prints a summary of each packet.
-- Identifies potentially threatening port scans.
-- Identifies potential denial of service attacks based the volume and frequency of certain requests.
-- Signature-based detection through the listing of malicious IPs, payload structures, and domain names.
-- Send alert emails upon the detection of suspicious activity.
-- Dashboard/UI displays alerts/event logs.
+## Features
 
-Goal capabilities:
-- Host application instead of running it locally.
-- Allow the creation of packets to test the system.
-- Expand to interfaces beyond Wi-Fi, for example ethernet.
+- **Packet Sniffing:** Captures and inspects network packets.
+- **Intrusion Detection:** Detects potential threats like port scans, DoS attacks, and signature-based anomalies.
+- **Real-Time Dashboard:** View network activity logs and alerts in a user-friendly interface.
+- **Email Notifications:** Sends alerts for suspicious activities detected on the network.
 
-## Setup
+## Setup Instructions
 
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/Jsamuda25/whisper.git
-   cd whisper
+### 1. Clone the Repository
+Clone this repository to your local machine:
+```bash
+git clone https://github.com/{your-username}/{your-repo-name}.git
+cd {your-repo-name}
+```
 
-2. Create and activate a virtual environment:
-    python3 -m venv venv
-    source venv/bin/activate   # On Linux/macOS
-    .\venv\Scripts\activate    # On Windows
+### 2. Set Up a Virtual Environment
+Create and activate a Python virtual environment:
 
-3. Install dependencies:
-    pip install -r requirements.txt
+#### On Linux/macOS:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
 
-4. Run the sniffer:
-    python sniffer.py
+#### On Windows:
+```bash
+python -m venv venv
+venv\Scripts\activate
+```
 
+### 3. Install Dependencies
+Install the required Python libraries:
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Configure Environment Variables
+Create a `.env` file in the project root directory and configure the following variables:
+```
+APP_PASSWORD=<your-app-password>
+SENDER_EMAIL=<your-email-address>
+RECEIVER_EMAIL=<receiver-email-address>
+```
+
+### 5. Run the Application
+
+#### Start the Sniffer and Dashboard
+Run the main entry point for the application:
+```bash
+python main.py
+```
+
+#### Access the Dashboard
+Open your browser and navigate to:
+```
+http://127.0.0.1:5000
+```
+
+## Project Structure
+
+```
+{your-repo-name}/
+|
+|-- defender/                      # Core functionality of the IDS and packet sniffer
+|   |-- __init__.py                # Package initializer
+|   |-- intrusion_detector.py      # Intrusion detection logic
+|   |-- sniffer.py                 # Packet sniffer implementation
+|
+|-- flask_app/                     # Flask app for the dashboard
+|   |-- __init__.py                # App factory
+|   |-- routes.py                  # Flask routes for the dashboard
+|   |-- templates/                 # HTML templates for the dashboard
+|       |-- index.html
+|-- logs/                          # Directory for log files
+|   |-- alerts.log                 # Log of network activity and alerts
+|
+|-- .env                           # Environment variables
+|-- requirements.txt               # Project dependencies
+|-- README.md                      # Project documentation (this file)
+|-- main.py                        # Entry point to start the system
+```
+
+## License
+This project is licensed under the MIT License. See the `LICENSE` file for details.
+
+## Contributing
+Pull requests are welcome. For significant changes, please open an issue to discuss what you would like to change.
+
+## Contact
+For questions or support, contact:
+- **Email:** [your-email@example.com]
+- **GitHub:** [https://github.com/your-username]
 
