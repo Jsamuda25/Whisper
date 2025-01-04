@@ -8,6 +8,12 @@ Current capabilities:
 - Identifies potential denial of service attacks based the volume and frequency of certain requests.
 - Signature-based detection through the listing of malicious IPs, payload structures, and domain names.
 - Send alert emails upon the detection of suspicious activity.
+- Dashboard/UI displays alerts/event logs.
+
+Goals:
+- Host application instead of running it locally.
+- Allow the creation of packets to test the system.
+- Expand to interfaces beyond Wi-Fi, for example ethernet.
 
 ## Setup
 
