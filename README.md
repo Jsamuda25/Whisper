@@ -14,8 +14,8 @@ This project is a lightweight network security monitoring system built with Pyth
 ### 1. Clone the Repository
 Clone this repository to your local machine:
 ```bash
-git clone https://github.com/{your-username}/{your-repo-name}.git
-cd {your-repo-name}
+git clone https://github.com/Jsamuda25/Whisper.git
+cd Whisper
 ```
 
 ### 2. Set Up a Virtual Environment
