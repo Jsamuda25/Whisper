@@ -64,7 +64,7 @@ http://127.0.0.1:5000
 ## Project Structure
 
 ```
-{your-repo-name}/
+{Whisper}/
 |
 |-- defender/                      # Core functionality of the IDS and packet sniffer
 |   |-- __init__.py                # Package initializer
@@ -84,15 +84,3 @@ http://127.0.0.1:5000
 |-- README.md                      # Project documentation (this file)
 |-- main.py                        # Entry point to start the system
 ```
-
-## License
-This project is licensed under the MIT License. See the `LICENSE` file for details.
-
-## Contributing
-Pull requests are welcome. For significant changes, please open an issue to discuss what you would like to change.
-
-## Contact
-For questions or support, contact:
-- **Email:** [your-email@example.com]
-- **GitHub:** [https://github.com/your-username]
-
