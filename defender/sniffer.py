@@ -1,18 +1,13 @@
-from scapy.all                      import sniff, get_if_list
-import                                     signal
+from scapy.all                      import sniff
 import                                     sys
 
-from intrusion_detector             import IntrusionDetector
+from .intrusion_detector             import IntrusionDetector
 
 class PacketSniffer:
     def __init__(self, interface="Wi-Fi"):
         self.interface = interface
         self.detector = IntrusionDetector()
 
-    def signal_handler(self, sig, frame):
-        """Handle graceful exit on signal interruption."""
-        print("Gracefully stopping the packet sniffer...")
-        sys.exit(0)
 
     def packet_callback(self, packet):
         """Callback function to process each captured packet."""
@@ -47,9 +42,6 @@ class PacketSniffer:
     def start(self):
         """Start sniffing packets."""
         print(f"Sniffer started on interface {self.interface}. Press Ctrl+C to stop.")
-
-        # Set up signal handler for graceful exit
-        signal.signal(signal.SIGINT, self.signal_handler)
 
         # Start sniffing packets
         sniff(iface=self.interface, prn=self.packet_callback, store=False, count=20)

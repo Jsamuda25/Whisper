@@ -3,7 +3,7 @@ import logging
 import time
 
 class ThreatLogger:
-    def __init__(self, log_file="alerts.log", log_format="json"):
+    def __init__(self, log_file="logs/alerts.log", log_format="json"): 
         self.log_file   = log_file
         self.log_format = log_format
 
@@ -28,7 +28,7 @@ class ThreatLogger:
         if self.log_format == "json":
             logging.info(json.dumps(log_entry))
         else:
-            log_message = f"{timestamp} | Threat: {threat_type} | Severity: {severity} | Src: {src_ip} | Dest: {dest_ip} | Port: {port} | Details: {details}\n"
+            log_message = f"{timestamp} | Threat: {threat_type} | Severity: {severity} | Ip:{ip} | Port: {port} | Details: {details}\n"
             logging.info(log_message)
 
     def log_info(self, message):

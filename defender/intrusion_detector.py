@@ -9,7 +9,7 @@ from dotenv                         import load_dotenv
 from scapy.layers.inet              import IP, TCP
 from scapy.layers.dns               import DNS
 from scapy.packet                   import Raw
-from logger                         import ThreatLogger
+from .logger                         import ThreatLogger
 
 # Load the .env file
 load_dotenv()
@@ -82,7 +82,7 @@ class IntrusionDetector:
                     if current_time - self.connection_attempts_scan[ip_src][tcp_dport]["last_time"] < self.SCAN_TIME_LIMIT:
                         alert_message = f"Port scan detected! IP: {ip_src} scanning port {tcp_dport}"
                         print(alert_message)
-                        self.send_alert(alert_message)
+                        # self.send_alert(alert_message)
                         self.logger.log_alert(threat_type="Port Scan", ip=ip_src, port=tcp_dport, severity=1, details=alert_message)
                         self.connection_attempts_scan[ip_src][tcp_dport]["count"] = 0
 
@@ -106,7 +106,7 @@ class IntrusionDetector:
                     if current_time - self.connection_attempts[ip_src]["last_time"] < self.DOS_TIME_LIMIT:
                         alert_message = f"DoS attack detected! IP: {ip_src}"
                         print(alert_message)
-                        self.send_alert(alert_message)
+                        # self.send_alert(alert_message)
                         self.logger.log_alert(threat_type="Denial of Service", ip=ip_src, severity=1, details=alert_message)
                         self.connection_attempts[ip_src]["count"] = 0
                 else:
@@ -141,7 +141,7 @@ class IntrusionDetector:
                 src_ip = packet[IP].src
                 if src_ip in blocklist:
                     print(f"Flagged source IP detected: {src_ip}!")
-                    self.set_signature("Source IP")
+                    self.set_signature("Flagged Source IP")
 
         except Exception as e:
             print(f"Error in flag_source_ip: {e}")

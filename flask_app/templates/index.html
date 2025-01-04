@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Packet Sniffer Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+    <h1>Packet Sniffer Dashboard</h1>
+    <h2>Recent Log Entries</h2>
+    <table id="logTable">
+        <thead>
+            <tr>
+                <th>Log Entry</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <script>
+        async function fetchLogs() {
+            const response = await fetch("/logs");
+            const logs = await response.json();
+            const logTable = document.getElementById("logTable").querySelector("tbody");
+            logTable.innerHTML = ""; // Clear existing rows
+            logs.forEach(log => {
+                const row = logTable.insertRow();
+                const cell = row.insertCell(0);
+                cell.textContent = log;
+            });
+        }
+        // Fetch logs every 5 seconds
+        fetchLogs();
+        setInterval(fetchLogs, 5000);
+    </script>
+</body>
+</html>
