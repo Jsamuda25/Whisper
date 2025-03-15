@@ -1,6 +1,7 @@
 import json
 import logging
 import time
+import sys
 
 class ThreatLogger:
     def __init__(self, log_file="logs/alerts.log", log_format="json"): 
@@ -9,7 +10,7 @@ class ThreatLogger:
 
         # Configure the logging module
         logging.basicConfig(
-            filename=self.log_file,
+            stream=sys.stdout,
             level=logging.INFO,
             format="%(message)s"
         )

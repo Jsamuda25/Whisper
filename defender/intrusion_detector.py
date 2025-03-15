@@ -82,7 +82,7 @@ class IntrusionDetector:
                     if current_time - self.connection_attempts_scan[ip_src][tcp_dport]["last_time"] < self.SCAN_TIME_LIMIT:
                         alert_message = f"Port scan detected! IP: {ip_src} scanning port {tcp_dport}"
                         print(alert_message)
-                        # self.send_alert(alert_message)
+                        self.send_alert(alert_message)
                         self.logger.log_alert(threat_type="Port Scan", ip=ip_src, port=tcp_dport, severity=1, details=alert_message)
                         self.connection_attempts_scan[ip_src][tcp_dport]["count"] = 0
 
