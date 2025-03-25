@@ -1,43 +1,70 @@
-from flask_app import create_app
-from defender.sniffer import PacketSniffer
+import sys
+import os
 import threading
 import signal
-import sys
-from scapy.all import get_if_list
+import time
+from scapy.all import get_if_list, ifaces
+from flask_app.app import app, start_sniffer
+from defender.sniffer import PacketSniffer
+from defender.logger import ThreatLogger  # Ensure logger is imported
 
-def get_default_interface():
-    """Detect the correct network interface based on the environment."""
-    interfaces = get_if_list()
-    print(f"Available interfaces: {interfaces}")
+class PacketSnifferApp:
+    def __init__(self):
+        self.interface = None
+        self.logger = ThreatLogger()  # Initialize logger
 
-    # WSL uses "eth0", fallback to first available interface
-    return "eth0" if "eth0" in interfaces else (interfaces[0] if interfaces else None)
+    def get_network_interface(self):
+        """Prompt the user to select a valid network interface with readable names."""
+        interfaces = get_if_list()  # Get list of interfaces
+        iface_details = [ifaces[iface] for iface in interfaces]  # Get detailed info
 
-def begin_sniffing():
-    """Start the packet sniffer."""
-    try:
-        interface = get_default_interface()
-        if not interface:
-            raise ValueError("No valid network interface found!")
+        print("\nAvailable network interfaces:")
+        for idx, iface in enumerate(iface_details):
+            print(f"{idx}: {iface.name} ({iface.mac})")  # Show name + MAC address
 
-        print(f"Starting packet sniffer on {interface}...")
-        sniffer = PacketSniffer(interface=interface)
-        sniffer.start()
-    except Exception as e:
-        print(f"Error starting the packet sniffer: {e}")
+        while True:
+            try:
+                choice = int(input("\nSelect the network interface (number): "))
+                if 0 <= choice < len(iface_details):
+                    self.interface = iface_details[choice].name  # Use the human-readable name
+                    self.logger.log_info(f"Selected network interface: {self.interface}")
+                    return
+                print("Invalid choice. Please select a valid number.")
+            except ValueError:
+                print("Invalid input. Please enter a number.")
+
+    def start_sniffer(self):
+        """Start the packet sniffer."""
+        try:
+            self.get_network_interface()
+            sniffer_thread = threading.Thread(target=start_sniffer, args=(self.interface,), daemon=True)
+            sniffer_thread.start()
+            self.logger.log_info(f"Starting packet sniffer on {self.interface}...")
+            print(f"Starting packet sniffer on {self.interface}...")
+        except Exception as e:
+            self.logger.log_error(f"Error starting sniffer: {e}")
+            print(f"Unexpected error: {e}")
 
 def signal_handler(sig, frame):
-    print("\nGracefully shutting down...")
-    sys.exit(0)
+    """Handles Ctrl+C to cleanly exit the program."""
+    print("\nStopping packet sniffer and Flask app...")
+    os._exit(0)  # Forcefully exit all threads and processes
 
 if __name__ == "__main__":
-    # Set up signal handler for graceful shutdown
+    # Register Ctrl+C handler
     signal.signal(signal.SIGINT, signal_handler)
 
-    # Start the packet sniffer in a background thread
-    sniffer_thread = threading.Thread(target=begin_sniffing, daemon=True)
-    sniffer_thread.start()
+    # Initialize and start the packet sniffer
+    app_instance = PacketSnifferApp()
+    app_instance.start_sniffer()
 
-    # Start the Flask app
-    app = create_app()
-    app.run(debug=True, port=5000, host="0.0.0.0")
+    # Run Flask in a separate daemon thread
+    app_thread = threading.Thread(target=app.run, kwargs={'debug': True, 'use_reloader': False}, daemon=True)
+    app_thread.start()
+
+    # Keep the main thread alive on Windows
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        signal_handler(None, None)
