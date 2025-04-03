@@ -69,9 +69,12 @@ Whisper/
 |   |-- __init__.py                # Package initializer
 |   |-- intrusion_detector.py      # Intrusion detection logic
 |   |-- sniffer.py                 # Packet sniffer implementation
+    |-- logger.py                  # Logging class for formatting and organization
+
 |
 |-- flask_app/                     # Flask app for the dashboard
 |   |-- __init__.py                # App factory
+    |-- app.py                     # Entry point of flask app
 |   |-- routes.py                  # Flask routes for the dashboard
 |   |-- templates/                 # HTML templates for the dashboard
 |       |-- index.html
@@ -82,4 +85,6 @@ Whisper/
 |-- requirements.txt               # Project dependencies
 |-- README.md                      # Project documentation (this file)
 |-- main.py                        # Entry point to start the system
+|-- Dockerfile
+|-- signatures.json                # Identification of high interest patterns
 ```
