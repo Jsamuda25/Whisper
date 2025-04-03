@@ -3,24 +3,33 @@ import os
 import threading
 import signal
 import time
+import requests  
 from scapy.all import get_if_list, ifaces
 from flask_app.app import app, start_sniffer
 from defender.sniffer import PacketSniffer
-from defender.logger import ThreatLogger  # Ensure logger is imported
+from defender.logger import ThreatLogger  
+
+FLASK_SERVER = "http://localhost:5000"
 
 class PacketSnifferApp:
     def __init__(self):
         self.interface = None
         self.logger = ThreatLogger()  # Initialize logger
 
+    def send_logs_to_server(self, log_entry):
+        try:
+            requests.post(f"{FLASK_SERVER}/log", json=log_entry)
+        except requests.exceptions.RequestException as e:
+            print(f"Error sending logs to server: {e}")
+
     def get_network_interface(self):
         """Prompt the user to select a valid network interface with readable names."""
         interfaces = get_if_list()  # Get list of interfaces
-        iface_details = [ifaces[iface] for iface in interfaces]  # Get detailed info
+        iface_details = [ifaces[iface] for iface in interfaces] 
 
         print("\nAvailable network interfaces:")
         for idx, iface in enumerate(iface_details):
-            print(f"{idx}: {iface.name} ({iface.mac})")  # Show name + MAC address
+            print(f"{idx}: {iface.name} ({iface.mac})") 
 
         while True:
             try:

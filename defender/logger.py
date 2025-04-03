@@ -5,7 +5,7 @@ import sys
 import os
 
 class ThreatLogger:
-    def __init__(self, log_file="logs/alerts.log", log_format="json"): 
+    def __init__(self,log_format="json",  log_file="logs/alerts.log"): 
         self.log_file   = log_file
         self.log_format = log_format
 
@@ -21,7 +21,7 @@ class ThreatLogger:
         )
 
     def log_alert(self, threat_type="", ip="", port="", severity=0, details=""):
-        print(f"LOGGING ALERT: {threat_type} | IP: {ip} | Port: {port} | Severity: {severity}")  # Debugging print
+        print(f"LOGGING ALERT: {threat_type} | IP: {ip} | Port: {port} | Severity: {severity}")
         timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
         log_entry = {
             "timestamp": timestamp,
@@ -32,11 +32,8 @@ class ThreatLogger:
             "details": details
         }
 
-        if self.log_format == "json":
-            logging.info(json.dumps(log_entry))  # Log JSON entry
-        else:
-            log_message = f"{timestamp} | Threat: {threat_type} | Severity: {severity} | IP: {ip} | Port: {port} | Details: {details}\n"
-            logging.info(log_message)
+        logging.info(json.dumps(log_entry))  # Log JSON entry
+    
 
     def log_info(self, message):
         logging.info(message)

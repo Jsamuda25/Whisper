@@ -7,7 +7,7 @@ from flask_app.routes import app_routes  # Import the routes blueprint
 app = Flask(__name__)
 
 # Register Blueprints
-app.register_blueprint(app_routes)  # <-- This is the missing line
+app.register_blueprint(app_routes) 
 
 sniffer = None
 
@@ -19,7 +19,11 @@ def start_sniffer(interface):
     global sniffer
     logger = ThreatLogger()
     sniffer = PacketSniffer(interface=interface, logger=logger)
-    sniffer.start()
+
+    # Run sniffer in a background thread
+    sniffer_thread = threading.Thread(target=sniffer.start)
+    sniffer_thread.daemon = True  # Ensures the thread exits when Flask stops
+    sniffer_thread.start()
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)

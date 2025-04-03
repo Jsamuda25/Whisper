@@ -1,20 +1,23 @@
-# Use Python base image
+# Use an official Python base image
 FROM python:3.11-slim
 
-# Set the working directory
-WORKDIR /Whisper
+# Set the PYTHONPATH to include /app
+ENV PYTHONPATH=/app
 
-# Copy only the requirements file first (better caching)
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy only requirements first (to leverage Docker caching)
 COPY requirements.txt .
 
-# Install dependencies (including Flask)
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the project files
+# Copy the rest of the application files
 COPY . .
 
-# Expose the Flask app's port
+# Expose the Flask port (5000)
 EXPOSE 5000
 
-# Run the app
-CMD ["python", "main.py"]
+# Command to run the application (corrected path to app.py)
+CMD ["python", "/app/flask_app/app.py"]
