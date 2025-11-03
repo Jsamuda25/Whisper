@@ -2,13 +2,13 @@ from scapy.all import sniff
 import sys
 import requests
 from .intrusion_detector import IntrusionDetector
-from .logger import ThreatLogger  # Fix spacing issue in import
+from .logger import ThreatLogger 
 
 class PacketSniffer:
     def __init__(self, interface="Wi-Fi", logger=None):
         self.interface = interface
         self.detector = IntrusionDetector()
-        self.logger = logger if logger else ThreatLogger()  # Logger instance
+        self.logger = logger if logger else ThreatLogger()
 
     def packet_callback(self, packet):
         """Callback function to process each captured packet."""
