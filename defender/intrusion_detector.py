@@ -64,6 +64,7 @@ class IntrusionDetector:
 
     def detect_port_scan(self, packet):
         """Detect potential port scans."""
+        found = False
         try:
             if packet.haslayer(IP) and packet.haslayer(TCP):
                 ip_src = packet[IP].src
@@ -81,6 +82,7 @@ class IntrusionDetector:
                 if self.connection_attempts_scan[ip_src][tcp_dport]["count"] > self.SCAN_THRESHOLD:
                     if current_time - self.connection_attempts_scan[ip_src][tcp_dport]["last_time"] < self.SCAN_TIME_LIMIT:
                         alert_message = f"Port scan detected! IP: {ip_src} scanning port {tcp_dport}"
+                        found = True
                         print(alert_message)
                         self.send_alert(alert_message)
                         self.logger.log_alert(threat_type="Port Scan", ip=ip_src, port=tcp_dport, severity=1, details=alert_message)
@@ -90,8 +92,11 @@ class IntrusionDetector:
         except Exception as e:
             print(f"Error in detect_port_scan: {e}")
 
+        return found
+
     def detect_dos_attack(self, packet):
         """Detect potential DoS attacks."""
+        found = False
         try:
             if packet.haslayer(IP):
                 ip_src = packet[IP].src
@@ -104,6 +109,7 @@ class IntrusionDetector:
 
                 if self.connection_attempts[ip_src]["count"] > self.DOS_THRESHOLD:
                     if current_time - self.connection_attempts[ip_src]["last_time"] < self.DOS_TIME_LIMIT:
+                        found = True
                         alert_message = f"DoS attack detected! IP: {ip_src}"
                         print(alert_message)
                         # self.send_alert(alert_message)
@@ -117,8 +123,11 @@ class IntrusionDetector:
         except Exception as e:
             print(f"Error in detect_dos_attack: {e}")
 
+        return found
+
     def signature_based_detection(self, packet):
         """Perform signature-based detection."""
+
         try:
             with open('signatures.json') as f:
                 data = json.load(f)
@@ -126,13 +135,19 @@ class IntrusionDetector:
                 payloads = data["malicious_payloads"]
                 malicious_domains = data["malicious_domains"]
 
-            self.flag_source_ip(packet, blocklist)
-            self.flag_malicious_payloads(packet, payloads)
-            self.flag_malicious_domains(packet, malicious_domains)
+            flag_source = self.flag_source_ip(packet, blocklist)
+            malicious_payload = self.flag_malicious_payloads(packet, payloads)
+            malicious_domain = self.flag_malicious_domains(packet, malicious_domains)
             self.logger.log_alert(threat_type=self.get_signature(), severity=1, details=f"Signature-based detection flagged packet: \n {packet.summary()}.")
+
+            if flag_source or malicious_payload or malicious_domain:
+                return True
+            
+            return False
 
         except Exception as e:
             print(f"Error in signature_based_detection: {e}")
+            return False
 
     def flag_source_ip(self, packet, blocklist):
         """Flag packets with source IPs from the blocklist."""
@@ -142,6 +157,9 @@ class IntrusionDetector:
                 if src_ip in blocklist:
                     print(f"Flagged source IP detected: {src_ip}!")
                     self.set_signature("Flagged Source IP")
+
+                    return True
+            return False
 
         except Exception as e:
             print(f"Error in flag_source_ip: {e}")
@@ -155,7 +173,9 @@ class IntrusionDetector:
                     if pattern in str(raw_data):
                         print(f"Alert! Malicious payload detected: {pattern}")
                         self.set_signature("Malicious Payload")
-                        break
+                        return True
+            return False
+                        
         except Exception as e:
             print(f"Error in flag_malicious_payloads: {e}")
 
@@ -167,5 +187,7 @@ class IntrusionDetector:
                 if domain_name in malicious_domains:
                     print(f"Alert! Malicious domain detected: {domain_name}")
                     self.set_signature("Suspicious Domain Name")
+                    return True
+            return False
         except Exception as e:
             print(f"Error in flag_malicious_domains: {e}")
